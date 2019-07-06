@@ -1,15 +1,18 @@
 
 #include <SDL.h>
 #include <SDL_ttf.h>
-
 #include "cuby.hpp"
 #include "texty.hpp"
 #include "highscore.hpp"
+#include "timer.hpp"
+#include "other.hpp"
 #include <stdio.h>
 #include <string>
 #include <random>
 const int SCREEN_WIDTH = 640;
 const int SCREEN_HEIGHT = 200;
+
+const Uint32 TIMEOUT = 5000; //For the moment const, maybe in the future the timeout could be changed
 int points = 0;
 int lastPoints = 0;
 string mode = "title";
@@ -54,6 +57,13 @@ SDL_Rect new_hsRect {
   w: SCREEN_WIDTH/4,
   h: SCREEN_HEIGHT/4
 };
+SDL_Rect timer_rect {
+  x: 0,
+  y: SCREEN_HEIGHT- SCREEN_HEIGHT/4,
+  w: SCREEN_WIDTH,
+  h: SCREEN_HEIGHT/4
+};
+SDL_Color timer_color = {0xB8, 0x9A, 0xFE}; //B89AFE
 bool newhs = false;
 int current_cubi = 0;
 bool quit = false;
@@ -122,6 +132,7 @@ int main(int argc, char *args[]) {
               
               if (current_cubi >= 5) {
                 current_cubi = 0;
+                reset_timer(TIMEOUT);
                 randomize_cubis();
                 color_cubis();
               }
@@ -130,6 +141,7 @@ int main(int argc, char *args[]) {
                 if(keyboard[SDL_SCANCODE_H]) {
                   mode = "help";
                 } else {
+                  reset_timer(TIMEOUT);
                   mode = "game";
                 }
                 
@@ -148,6 +160,11 @@ int main(int argc, char *args[]) {
           
         
         render();
+        if (mode == "game") {
+          if (get_timer_status()) {
+            restart();
+          }
+        }
       }
     }
   }
@@ -220,7 +237,10 @@ void render() {
       for (int i=0; i<5; i++) {
         cubis[i].render(gRenderer);
       }
+      SDL_SetRenderDrawColor(gRenderer, timer_color.r, timer_color.g, timer_color.b, 0xFF);
+      timer_rect.w = Adjust(get_timer_difference(), 0, TIMEOUT, 0, SCREEN_WIDTH);
       
+      SDL_RenderFillRect(gRenderer, &timer_rect);
   }
   if (mode == "title") {
     SDL_Rect titleR {
