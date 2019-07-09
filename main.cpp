@@ -51,12 +51,6 @@ SDL_Rect hsRect = {
   w: SCREEN_WIDTH/4,
   h: SCREEN_HEIGHT/4
 };
-SDL_Rect new_hsRect {
-  x: SCREEN_WIDTH-SCREEN_WIDTH/3,
-  y: SCREEN_HEIGHT/2+SCREEN_HEIGHT/5,
-  w: SCREEN_WIDTH/4,
-  h: SCREEN_HEIGHT/4
-};
 SDL_Rect timer_rect {
   x: 0,
   y: SCREEN_HEIGHT- SCREEN_HEIGHT/4,
@@ -231,9 +225,6 @@ void render() {
   if (mode == "game") {
       render_text(gRenderer, font, std::to_string(points), {0, 0, 0}, pointsRect);
       render_text(gRenderer, font, hs_text, {0, 0, 0}, hsRect);
-      if (newhs) {
-        render_text(gRenderer, font, "NEW HIGHSCORE!", {0, 0, 0}, new_hsRect);
-      }
       for (int i=0; i<5; i++) {
         cubis[i].render(gRenderer);
       }
